@@ -1,0 +1,45 @@
+
+zookeeper:
+  image: mesoscloud/zookeeper
+  net: host
+  environment:
+    - MYID=1
+    - SERVERS=node-1
+  restart: always
+
+master:
+  image: mesoscloud/mesos-master
+  net: host
+  environment:
+    - MESOS_HOSTNAME
+    - MESOS_IP
+    - MESOS_ZK
+    - MESOS_PORT=5050
+    - MESOS_LOG_DIR=/var/log/mesos
+    - MESOS_QUORUM=1
+    - MESOS_WORK_DIR=/var/run/mesos
+  restart: always
+
+slave:
+  image: mesoscloud/mesos-slave
+  net: host
+  environment:
+    - MESOS_HOSTNAME
+    - MESOS_IP
+    - MESOS_MASTER
+  volumes:
+    - /sys/fs/cgroup:/sys/fs/cgroup
+    - /var/run/docker.sock:/var/run/docker.sock
+  privileged: true
+  restart: always
+
+marathon:
+  image: mesoscloud/marathon
+  net: host
+  environment: 
+    - MARATHON_HOSTNAME
+    - MARATHON_HTTPS_ADDRESS
+    - MARATHON_HTTP_ADDRESS
+    - MARATHON_MASTER
+    - MARATHON_ZK
+  restart: always
